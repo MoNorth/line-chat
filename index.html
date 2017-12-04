@@ -1,19 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat</title>
     <style>
-        #line-chat{
+        #line-chat {
             width: 300px;
             height: 150px;
-            background-color: #999;
+            margin: 0 auto;
+        }
+
+        .bg {
+            background-color: #033C7B;
+            height: 300px;
+            width: 500px;
+            margin: 0 auto;
+            padding-top: 50px;
         }
     </style>
 </head>
+
 <body>
-    <div id="line-chat"></div>
+    <div class="bg">
+        <div id="line-chat"></div>
+
+    </div>
 </body>
+<!-- <script src="dist/chat.js"></script> -->
+<script>
+    const chat = new lineChat({
+        width: '100%', //canvas宽度
+        height: '100%', //canvas高度
+        space: 20,  //曲线最高点距上下边距
+        line: {  //背景的栅格横线样式
+            style: '#fff',
+            width: 0.8,
+            arcR : 1.8,
+            num  : 4,
+            alpha: 0.3
+        },
+        point: {  //最高点圆点样式（他是由两个圆圈构成的，所以样式分别是out和in）
+            outStyle: '#fff',
+            inStyle: '#0FC69B',
+            outR: 6,
+            inR: 4,
+            alpha: 1
+        },
+        Bezier: {  //曲线的样式
+            style: '#fff',
+            width: 2,
+            alpha: 0.8,
+            bg : "#3477BB", 
+            bgAlpha: 0.5
+        },
+        data: {  //数据
+            y: [100, 50, 351,12,265,123],
+            hasPoint: [2]  //显示圆圈的索引
+        }
+    })
+    chat.init()
+</script>
+
 </html>

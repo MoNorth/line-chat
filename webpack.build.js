@@ -5,12 +5,10 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
-  entry: ['./src/index.js', './src/tata.css'],
+  entry: ['./src/index.js'],
   output: {
-    filename: 'tata.js',
-    path: path.resolve(__dirname, 'dist'),
-    library: 'tata',
-    libraryTarget: 'window'
+    filename: 'chat.js',
+    path: path.resolve(__dirname, 'dist')
   },
   target: 'web',
   module: {
