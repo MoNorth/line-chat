@@ -25,6 +25,7 @@ export default class lineChat {
         }
 
         this.param = {
+            type: "line",
             width: '100%',
             height: '100%',
             space: 20,
@@ -98,14 +99,19 @@ export default class lineChat {
             throw "浏览器不支持"
         
         
-
-        this.draw()
+        switch(this.param.type) {
+            default:
+                this.drawLine()
+        }
         this.$.appendChild(canvas)
     }
 
-    draw() {
+    drawLine() {
         this._drawLine()
         this.computedPoint = this._compute()
+
+        console.table(this.computedPoint)
+
         this.drawPoint = this._getControlPoint(this.computedPoint)
         this._drawBezier()
 
@@ -237,7 +243,7 @@ export default class lineChat {
         let   point = outR
 
         
-        const scales = half / this._findMax(data)
+        const scales = half / Math.abs(this._findMax(data) - data[0])
         
         const disparity = data.map((item) => {
             return (data[0] - item) * scales + half + this.param.space
@@ -269,7 +275,23 @@ export default class lineChat {
     _getControlPoint(path) {
         let rt = 0.3;
         let i = 0, count = path.length - 2;
-        let arr = [];
+        let arr = []
+        const point = this.computedPoint
+
+        if(count < 1)
+        {
+            return point.map((item) => {
+                return {
+                    cp1x: item.x,
+                    cp1y: item.y,
+                    cp2x: item.x,
+                    cp2y: item.y,
+                    x : item.x,
+                    y : item.y
+                }
+            })
+        }
+
         for (; i < count; i++) {
             let a = path[i], b = path[i + 1], c = path[i + 2];
             let v1 = new Vector2(a.x - b.x, a.y - b.y);
@@ -289,7 +311,7 @@ export default class lineChat {
             }
         }
 
-        const point = this.computedPoint
+        
         const drawPoint = []
         i = 0
         point.forEach((item, index) => {

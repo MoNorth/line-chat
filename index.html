@@ -7,15 +7,22 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat</title>
     <style>
-        #line-chat {
+        #line-chat{
             width: 300px;
             height: 150px;
             margin: 0 auto;
         }
 
+        #shan{
+            width: 200px;
+            height: 200px;
+            margin: 100px auto;
+            background-color: #fff;
+        }
+
         .bg {
             background-color: #033C7B;
-            height: 300px;
+            height: 500px;
             width: 500px;
             margin: 0 auto;
             padding-top: 50px;
@@ -26,13 +33,12 @@
 <body>
     <div class="bg">
         <div id="line-chat"></div>
-
+        <div id="shan"></div>
     </div>
 </body>
 <!-- <script src="dist/chat.js"></script> -->
 <script>
-    const chat = new lineChat({
-        dom: '#line-chat',
+    const chat = new lineChat('#line-chat',{
         width: '100%', //canvas宽度
         height: '100%', //canvas高度
         space: 20,  //曲线最高点距上下边距
@@ -58,11 +64,19 @@
             bgAlpha: 0.5
         },
         data: {  //数据
-            y: [100, 50, 351,12,265,123],
-            hasPoint: [2]  //显示圆圈的索引
+            y: [100000, 132, 100000],
+            hasPoint: [0,1, 2,3,4,5,6]  //显示圆圈的索引
         }
     })
     chat.init()
+
+
+    const shan = new lineChat('#shan', {
+        type: 'shan',
+        width: '100%',
+        height: '100%',
+    })
+    // shan.init()
 </script>
 
 </html>
