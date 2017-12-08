@@ -51,8 +51,13 @@ export default class lineChat {
                 bgAlpha: 1 
             },
             data: {
-                y: [],
+                y: [0, 0],
                 hasPoint: []
+            },
+            shan: {
+                sr: 30,
+                scolor: "#fff",
+                color: [],
             }
         }
 
@@ -100,18 +105,83 @@ export default class lineChat {
         
         
         switch(this.param.type) {
+            case 'shan':
+                this.drawShan()
+                break
             default:
                 this.drawLine()
         }
         this.$.appendChild(canvas)
     }
 
+    drawShan() {
+        this._computeArc()
+        this.computeShanData = this._computeShanData()
+        this._drawShan()
+    }
+
+    _drawShan() {
+        const { sr, color, br, x, y, scolor} = this.param.shan,
+              computeShanData         = this.computeShanData
+        
+        computeShanData.forEach((item, index) => {
+            this._drawShanB(x, y, br, item.begin, item.end, color[index])
+        });
+        this._drawShanB(x, y, sr, 0, 2 * Math.PI, scolor)
+    }
+
+    _drawShanB(x, y, r, sAngle, eAngle, color) {
+        const ctx = this.ctx
+        color || (color = this.getRandomColor())
+        ctx.save()
+        ctx.beginPath()
+
+        ctx.moveTo(x, y)
+        ctx.fillStyle = color
+        ctx.arc(x, y, r, sAngle, eAngle)
+        ctx.fill()
+
+        ctx.closePath()
+        ctx.restore()
+    }
+
+    getRandomColor() {    
+        const colorStr = "0123456789abcdef"
+        const color    = [0,0,0,0,0,0].map(() => {
+            return colorStr.charAt(Math.floor(Math.random() * 16))
+        })
+        return "#" + color.join('')
+    } 
+
+    _computeShanData() {
+        const data = this.param.data.y || [],
+              base = data.reduce((a, b) => {
+                    return a + b
+              }),
+              P = 2 * Math.PI
+        let count = 0
+        return data.map((item) => {
+            let begin = count,
+                end   = count + item / base * P
+            count = end
+            return {
+                begin,
+                end
+            }
+        })
+    }
+
+    _computeArc() {
+        const width  = this.canvas.width,
+              height = this.canvas.height
+        this.param.shan.br = width > height ? height / 2 : width / 2
+        this.param.shan.x  = width / 2
+        this.param.shan.y  = height / 2 
+    }
+
     drawLine() {
         this._drawLine()
         this.computedPoint = this._compute()
-
-        console.table(this.computedPoint)
-
         this.drawPoint = this._getControlPoint(this.computedPoint)
         this._drawBezier()
 

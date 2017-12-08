@@ -17,12 +17,11 @@
             width: 200px;
             height: 200px;
             margin: 100px auto;
-            background-color: #fff;
         }
 
         .bg {
             background-color: #033C7B;
-            height: 500px;
+            height: 300px;
             width: 500px;
             margin: 0 auto;
             padding-top: 50px;
@@ -33,10 +32,12 @@
 <body>
     <div class="bg">
         <div id="line-chat"></div>
-        <div id="shan"></div>
     </div>
+
+    <div id="shan"></div>
+    
 </body>
-<!-- <script src="dist/chat.js"></script> -->
+<script src="dist/chat.js"></script>
 <script>
     const chat = new lineChat('#line-chat',{
         width: '100%', //canvas宽度
@@ -72,11 +73,19 @@
 
 
     const shan = new lineChat('#shan', {
-        type: 'shan',
+        type: 'shan',  //类型
         width: '100%',
         height: '100%',
+        data: {
+            y: [ 31, 123, 123, 321, 46, 256]   //数据
+        },
+        shan: {
+            scolor: "#fff", //圆心颜色
+            sr: 45, //圆心半径
+            color: ["#FFBB18", "#5AD1F6", "#9FD571", "#9AAFF5", "#FF8584", "#FFDB33"]  //每个扇形的颜色，不定义颜色随机
+        }
     })
-    // shan.init()
+    shan.init()
 </script>
 
 </html>
