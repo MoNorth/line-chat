@@ -34,10 +34,12 @@
         <div id="line-chat"></div>
     </div>
 
+    <button id="go">go</button>
+
     <div id="shan"></div>
     
 </body>
-<script src="dist/chat.js"></script>
+<!-- <script src="dist/chat.js"></script> -->
 <script>
     const chat = new lineChat('#line-chat',{
         width: '100%', //canvas宽度
@@ -70,6 +72,10 @@
         }
     })
     chat.init()
+
+    document.getElementById("go").onclick = () => {
+        chat.go()
+    }
 
 
     const shan = new lineChat('#shan', {

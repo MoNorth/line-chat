@@ -34,7 +34,8 @@ export default class lineChat {
                 width: 1,
                 arcR : 2,
                 num  : 4,
-                alpha: 1
+                alpha: 1,
+                anim: 150,
             },
             point: {
                 outStyle: '#fff',
@@ -114,6 +115,18 @@ export default class lineChat {
         this.$.appendChild(canvas)
     }
 
+    go() {
+        switch(this.param.type) {
+            case 'shan':
+                this.drawShan()
+                break
+            default:
+                this.animDranLine()
+        }
+    }
+
+
+
     drawShan() {
         this._computeArc()
         this.computeShanData = this._computeShanData()
@@ -179,12 +192,58 @@ export default class lineChat {
         this.param.shan.y  = height / 2 
     }
 
+    animDranLine() {
+        let time   = this.param.line.anim,
+            height = this.canvas.height / 3,
+            H      = 0
+        const skip = height * 16 / time,
+              ctx  = this.ctx
+        
+        this.computedPoint = this._compute()
+        this.drawPoint = this._getControlPoint(this.computedPoint)
+
+        const draw = (H, h) => {
+
+            console.log(H, h)
+
+            ctx.translate(0, H)
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this._drawLine()
+            ctx.translate(0, h)
+            this._drawBezier()
+            this._drawPoint()
+        }
+        const timer = setInterval(() => {
+            draw(H, height)
+            H = height * -1
+            height -= skip
+            if(height < -20)
+            {
+                clearInterval(timer)
+                const timer2 = setInterval(() => {
+                    draw(H, height)
+                    H = height * -1
+                    height += skip / 8
+                    if(height > 0)
+                    {
+                        clearInterval(timer2)
+                        draw(H, 0)         
+                    }
+                })
+                
+            }
+        }, 16)
+        
+        
+        
+
+    }
+
     drawLine() {
         this._drawLine()
         this.computedPoint = this._compute()
         this.drawPoint = this._getControlPoint(this.computedPoint)
         this._drawBezier()
-
         this._drawPoint()
     }
 
