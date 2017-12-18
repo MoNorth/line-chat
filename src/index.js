@@ -1,24 +1,19 @@
 export default class lineChat {
-    constructor(dom, params)
-    { 
-        if(params)
-        {
+    constructor(dom, params) {
+        if (params) {
             let os = Object.prototype.toString.call(dom)
-            if( os === "[object String]" )
-            {
+            if (os === "[object String]") {
                 this.dom = dom
                 this.$ = document.querySelector(dom)
             }
-            else if( os === "[object Object]")
-            {
+            else if (os === "[object Object]") {
                 this.dom = os.id || ""
                 this.$ = os
             }
             else
                 throw "dom非法"
         }
-        else
-        {
+        else {
             params = dom
             this.dom = "#line-chat"
             this.$ = document.querySelector(this.dom)
@@ -32,10 +27,15 @@ export default class lineChat {
             line: {
                 style: '#fff',
                 width: 1,
-                arcR : 2,
-                num  : 4,
+                arcR: 2,
+                num: 4,
                 alpha: 1,
                 anim: 150,
+            },
+            anim: {
+                time: 150,
+                height: 2,
+                more: 20
             },
             point: {
                 outStyle: '#fff',
@@ -48,8 +48,8 @@ export default class lineChat {
                 style: '#fff',
                 width: 2,
                 alpha: 1,
-                bg : "#3477BB", 
-                bgAlpha: 1 
+                bg: "#3477BB",
+                bgAlpha: 1
             },
             data: {
                 y: [0, 0],
@@ -63,49 +63,46 @@ export default class lineChat {
         }
 
         this._extend(this.param, params)
-        
+        this.timer = null
+
     }
 
     _extend(obj1, obj2) {
-        for(let key in obj2)
-        {
+        for (let key in obj2) {
             let os = Object.prototype.toString.call(obj2[key])
-            if(os === "[object Array]" || os === "[object Object]")
-            {
+            if (os === "[object Array]" || os === "[object Object]") {
                 this._extend(obj1[key], obj2[key])
             }
             else
-                obj1[key] = obj2[key]            
+                obj1[key] = obj2[key]
         }
     }
 
     init() {
-        const canvas  = this.canvas 
-                      = document.createElement("canvas")
-        const _width  = this.$.clientWidth,
-              _height = this.$.clientHeight
-        if(~(this.param.width + "").indexOf('%'))
-        {
+        const canvas = this.canvas
+            = document.createElement("canvas")
+        const _width = this.$.clientWidth,
+            _height = this.$.clientHeight
+        if (~(this.param.width + "").indexOf('%')) {
             let width = parseInt(this.param.width)
             canvas.width = _width * width / 100
         }
         else
             canvas.width = this.param.width
-        if(~(this.param.height + "").indexOf('%'))
-        {
+        if (~(this.param.height + "").indexOf('%')) {
             let height = parseInt(this.param.height)
             canvas.height = _height * height / 100
         }
         else
             canvas.height = this.param.height
-    
+
         if (canvas.getContext)
             this.ctx = canvas.getContext("2d")
         else
             throw "浏览器不支持"
-        
-        
-        switch(this.param.type) {
+
+
+        switch (this.param.type) {
             case 'shan':
                 this.drawShan()
                 break
@@ -116,13 +113,18 @@ export default class lineChat {
     }
 
     go() {
-        switch(this.param.type) {
-            case 'shan':
-                this.drawShan()
-                break
-            default:
-                this.animDranLine()
+        const g = () => {
+            switch (this.param.type) {
+                case 'shan':
+                    this.drawShan()
+                    break
+                default:
+                    this.animDranLine()
+            }
         }
+        clearTimeout(this.timer)
+        this.timer = setTimeout(g, 500);
+        
     }
 
 
@@ -134,9 +136,9 @@ export default class lineChat {
     }
 
     _drawShan() {
-        const { sr, color, br, x, y, scolor} = this.param.shan,
-              computeShanData         = this.computeShanData
-        
+        const { sr, color, br, x, y, scolor } = this.param.shan,
+            computeShanData = this.computeShanData
+
         computeShanData.forEach((item, index) => {
             this._drawShanB(x, y, br, item.begin, item.end, color[index])
         });
@@ -158,24 +160,24 @@ export default class lineChat {
         ctx.restore()
     }
 
-    getRandomColor() {    
+    getRandomColor() {
         const colorStr = "0123456789abcdef"
-        const color    = [0,0,0,0,0,0].map(() => {
+        const color = [0, 0, 0, 0, 0, 0].map(() => {
             return colorStr.charAt(Math.floor(Math.random() * 16))
         })
         return "#" + color.join('')
-    } 
+    }
 
     _computeShanData() {
         const data = this.param.data.y || [],
-              base = data.reduce((a, b) => {
-                    return a + b
-              }),
-              P = 2 * Math.PI
+            base = data.reduce((a, b) => {
+                return a + b
+            }),
+            P = 2 * Math.PI
         let count = 0
         return data.map((item) => {
             let begin = count,
-                end   = count + item / base * P
+                end = count + item / base * P
             count = end
             return {
                 begin,
@@ -185,26 +187,24 @@ export default class lineChat {
     }
 
     _computeArc() {
-        const width  = this.canvas.width,
-              height = this.canvas.height
+        const width = this.canvas.width,
+            height = this.canvas.height
         this.param.shan.br = width > height ? height / 2 : width / 2
-        this.param.shan.x  = width / 2
-        this.param.shan.y  = height / 2 
+        this.param.shan.x = width / 2
+        this.param.shan.y = height / 2
     }
 
     animDranLine() {
-        let time   = this.param.line.anim,
-            height = this.canvas.height / 3,
-            H      = 0
+        let time = this.param.anim.time,
+            height = this.canvas.height / this.param.anim.height,
+            H = 0
         const skip = height * 16 / time,
-              ctx  = this.ctx
-        
+            ctx = this.ctx
+
         this.computedPoint = this._compute()
         this.drawPoint = this._getControlPoint(this.computedPoint)
 
         const draw = (H, h) => {
-
-            console.log(H, h)
 
             ctx.translate(0, H)
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -213,29 +213,26 @@ export default class lineChat {
             this._drawBezier()
             this._drawPoint()
         }
-        const timer = setInterval(() => {
-            draw(H, height)
-            H = height * -1
-            height -= skip
-            if(height < -20)
-            {
-                clearInterval(timer)
-                const timer2 = setInterval(() => {
-                    draw(H, height)
-                    H = height * -1
-                    height += skip / 8
-                    if(height > 0)
-                    {
-                        clearInterval(timer2)
-                        draw(H, 0)         
-                    }
-                })
-                
-            }
-        }, 16)
-        
-        
-        
+
+        const startTime = Date.now(),
+               distance = -height;
+
+        if(this.cleared)
+        {
+            this.cleared = false
+            requestAnimationFrame(function step() {
+                let p = Math.min(1.0, (Date.now() - startTime) / time);
+                draw(H, height)
+                H = height * -1
+                height = distance * p * (2-p) - distance
+                if (p < 1.0) requestAnimationFrame(step);
+                else    draw(H, 0)
+            });
+        }
+            
+
+
+
 
     }
 
@@ -247,19 +244,29 @@ export default class lineChat {
         this._drawPoint()
     }
 
+    clear() {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+            this._drawLine()
+            this.cleared = true
+        }, 500);
+       
+    }
+
     _drawBezier() {
         const ctx = this.ctx,
-              cp  = this.computedPoint,
-              dp  = this.drawPoint,
-              { style, width, alpha, bg, bgAlpha } = this.param.Bezier
+            cp = this.computedPoint,
+            dp = this.drawPoint,
+            { style, width, alpha, bg, bgAlpha } = this.param.Bezier
         ctx.save()
         ctx.beginPath()
         ctx.strokeStyle = style
-        ctx.lineWidth = width 
+        ctx.lineWidth = width
         ctx.globalAlpha = alpha
         ctx.fillStyle = bg
         ctx.moveTo(cp[0].x, cp[0].y)
-        dp.forEach(({cp1x, cp1y, cp2x, cp2y, x, y})=>{
+        dp.forEach(({ cp1x, cp1y, cp2x, cp2y, x, y }) => {
             ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)
         })
         ctx.stroke()
@@ -276,10 +283,10 @@ export default class lineChat {
         ctx.restore()
     }
 
-    _drawLine() {   
+    _drawLine() {
         const points = this._getPointByLine(),
-              ctx    = this.ctx,
-              { style, width, arcR, alpha } = this.param.line
+            ctx = this.ctx,
+            { style, width, arcR, alpha } = this.param.line
         ctx.save()
         ctx.beginPath()
         ctx.strokeStyle = style
@@ -293,7 +300,7 @@ export default class lineChat {
         })
 
         ctx.stroke()
-        
+
         points.forEach((point) => {
             ctx.moveTo(point.x1, point.y1)
             ctx.arc(point.x1, point.y1, arcR, 0 * Math.PI, 2 * Math.PI)
@@ -311,15 +318,15 @@ export default class lineChat {
 
     _drawPoint() {
         const points = this.computedPoint,
-              ctx    = this.ctx,
-              { outStyle, inStyle, outR, inR, alpha } = this.param.point,
-              hasPoint = this.param.data.hasPoint
+            ctx = this.ctx,
+            { outStyle, inStyle, outR, inR, alpha } = this.param.point,
+            hasPoint = this.param.data.hasPoint
         ctx.save()
         ctx.beginPath()
         ctx.fillStyle = outStyle
         ctx.globalAlpha = alpha
         points.forEach((point, index) => {
-            if(~hasPoint.indexOf(index)){
+            if (~hasPoint.indexOf(index)) {
                 ctx.moveTo(point.x, point.y)
                 ctx.arc(point.x, point.y, outR, 0 * Math.PI, 2 * Math.PI)
             }
@@ -329,7 +336,7 @@ export default class lineChat {
         ctx.beginPath()
         ctx.fillStyle = inStyle
         points.forEach((point, index) => {
-            if(~hasPoint.indexOf(index)){
+            if (~hasPoint.indexOf(index)) {
                 ctx.moveTo(point.x, point.y)
                 ctx.arc(point.x, point.y, inR, 0 * Math.PI, 2 * Math.PI)
             }
@@ -343,14 +350,13 @@ export default class lineChat {
 
     _getPointByLine() {
         const points = [],
-              { num, arcR } = this.param.line,
-              outR   = this.param.point.outR,
-              width  = this.canvas.width - (outR - arcR),
-              height = this.canvas.height - arcR * 2,
-              skill  = height / num
-        let   point  = arcR
-        while(point <= height + arcR * 2)
-        {
+            { num, arcR } = this.param.line,
+            outR = this.param.point.outR,
+            width = this.canvas.width - (outR - arcR),
+            height = this.canvas.height - arcR * 2,
+            skill = height / num
+        let point = arcR
+        while (point <= height + arcR * 2) {
             points.push({
                 x1: outR - arcR,
                 y1: point,
@@ -363,17 +369,17 @@ export default class lineChat {
     }
 
     _compute() {
-        const data   = this.param.data.y || [],
-              { outR } = this.param.point,
-              length = data.length,
-              half = this.canvas.height / 2 - this.param.space,
-              width = this.canvas.width - outR * 2,
-              skill = width / (length - 1)
-        let   point = outR
+        const data = this.param.data.y || [],
+            { outR } = this.param.point,
+            length = data.length,
+            half = this.canvas.height / 2 - this.param.space,
+            width = this.canvas.width - outR * 2,
+            skill = width / (length - 1)
+        let point = outR
 
-        
+
         const scales = half / Math.abs(this._findMax(data) - data[0])
-        
+
         const disparity = data.map((item) => {
             return (data[0] - item) * scales + half + this.param.space
         })
@@ -407,16 +413,15 @@ export default class lineChat {
         let arr = []
         const point = this.computedPoint
 
-        if(count < 1)
-        {
+        if (count < 1) {
             return point.map((item) => {
                 return {
                     cp1x: item.x,
                     cp1y: item.y,
                     cp2x: item.x,
                     cp2y: item.y,
-                    x : item.x,
-                    y : item.y
+                    x: item.x,
+                    y: item.y
                 }
             })
         }
@@ -440,46 +445,42 @@ export default class lineChat {
             }
         }
 
-        
+
         const drawPoint = []
         i = 0
         point.forEach((item, index) => {
-            if(index === point.length - 1)
-            {
+            if (index === point.length - 1) {
                 drawPoint.push({
                     cp1x: arr[i].x,
                     cp1y: arr[i].y,
                     cp2x: item.x,
                     cp2y: item.y,
-                    x : item.x,
-                    y : item.y
+                    x: item.x,
+                    y: item.y
                 })
             }
-            else if(index === 0)
-            {
+            else if (index === 0) {
 
             }
-            else if(index === 1)
-            {
+            else if (index === 1) {
                 drawPoint.push({
                     cp1x: arr[i].x,
                     cp1y: arr[i].y,
                     cp2x: item.x,
                     cp2y: item.y,
-                    x : item.x,
-                    y : item.y
+                    x: item.x,
+                    y: item.y
                 })
                 i += 1
             }
-            else
-            {
+            else {
                 drawPoint.push({
                     cp1x: arr[i].x,
                     cp1y: arr[i].y,
                     cp2x: arr[i + 1].x,
                     cp2y: arr[i + 1].y,
-                    x : item.x,
-                    y : item.y
+                    x: item.x,
+                    y: item.y
                 })
                 i += 2
             }
@@ -519,10 +520,10 @@ class Vector2 {
     }
 
     angle(v) {
-        return Math.acos(this.dot(v) / (this.length() *v.length())) * 180 / Math.PI;
+        return Math.acos(this.dot(v) / (this.length() * v.length())) * 180 / Math.PI;
     }
 
-    
+
 }
 
 window && (window.lineChat = lineChat)

@@ -35,6 +35,8 @@
     </div>
 
     <button id="go">go</button>
+    <button id="clear">clear</button>
+
 
     <div id="shan"></div>
     
@@ -75,6 +77,9 @@
 
     document.getElementById("go").onclick = () => {
         chat.go()
+    }
+    document.getElementById("clear").onclick = () => {
+        chat.clear()
     }
 
 
